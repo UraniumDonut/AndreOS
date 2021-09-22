@@ -54,11 +54,19 @@ class MyClient(discord.Client):
             """
             anfrage = satz + "-"
             await message.channel.send(satz)
-            antwort = openai.Completion.create(engine="davinci", prompt=anfrage, stop=stop, temperature=0.3)
+            antwort = openai.Completion.create(engine="curie", prompt=anfrage, stop=stop, temperature=0.3)
             choice = antwort["choices"][0]["text"]
 
             await message.channel.send("-"+choice)
 
+        async def frage(inhalt):
+            anfrage = "Q: " + inhalt + """
+            A:"""
+
+            antwort = openai.Completion.create(engine="curie", prompt=anfrage, stop=stop, temperature=0.3)
+            choice = antwort["choices"][0]["text"]
+            
+            await message.channel.send(choice)
 
         # reagiert nicht auf eigene Botnachrichten
         if message.author == client.user:
@@ -85,7 +93,7 @@ class MyClient(discord.Client):
         if message.content.startswith("!test"):
             1
         if message.content.startswith("!klopf"):
-            mes = message.content.split(" ")
+            mes = message.content.split(" ",1)
             try:
                 zusatz2 = mes[1]
             except IndexError:
@@ -97,7 +105,19 @@ class MyClient(discord.Client):
             mess = [mes[0].lower(), zusatz2.lower(), zusatz.lower()]
             if(zusatz2 != " "):
                 await klopf(zusatz2)
-
+        if message.content.startswith("!frage"):
+            mes = message.content.split(" ", 1)
+            try:
+                zusatz2 = mes[1]
+            except IndexError:
+                zusatz2 = " "
+            try:
+                zusatz = mes[2]
+            except IndexError:
+                zusatz = " "
+            mess = [mes[0].lower(), zusatz2.lower(), zusatz.lower()]
+            if (zusatz2 != " "):
+                await frage(zusatz2)
 #====================================================================================================================================================================================================
 
 
