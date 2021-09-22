@@ -8,13 +8,18 @@ import asyncio
 import aioschedule as schedule
 import sqlite3
 from sqlite3 import Error
-
+import openai
 
 path = os.getcwd()
 print(path)
 os.chdir(path)
 
 
+
+with open("keys.json", "r") as f:
+    keys = json.load(f)
+openai.api_key = keys["openai"]
+stop = "\n"
 # chdir passt sich an, den String Path ändern, wenn du was machen willst
 
 # Helper functions
@@ -40,6 +45,21 @@ class MyClient(discord.Client):
 
     async def on_message(self, message):
 
+        async def klopf(inhalt):
+            satz = """-Knock knock
+            -Who's there?
+            -"""
+            satz = satz + inhalt + """.
+            -""" + inhalt + """ who?
+            """
+            anfrage = satz + "-"
+            await message.channel.send(satz)
+            antwort = openai.Completion.create(engine="davinci", prompt=anfrage, stop=stop, temperature=0.3)
+            choice = antwort["choices"][0]["text"]
+
+            await message.channel.send("-"+choice)
+
+
         # reagiert nicht auf eigene Botnachrichten
         if message.author == client.user:
             return
@@ -50,36 +70,7 @@ class MyClient(discord.Client):
             await message.delete()
             await message.channel.send("🇹 🇭 🇦 🇹 🇸 🇨 🇷 🇮 🇳 🇬 🇪")
 
-        if message.content.startswith("!help"):
-            embed_help = discord.Embed(colour=discord.Colour(0x9999))
 
-            embed_help.set_author(name="Snensbot Befehle")
-
-            embed_help.add_field(name="!now", value="Gibt die aktuelle Stunde mit Zoomlink im Namen!!!! und Infos zum Fach zurück",
-                                 inline=False)
-            embed_help.add_field(name="!Fach <fach> ", value="Gibt das ausgewählte Fach (Zoomlink im Namen!!) mit Infos zurück",
-                                 inline=False)
-            embed_help.add_field(name="!spe oder !SPE",
-                                 value="Gibt den derzeitigen SPE Link an (Gründer schaut drauf)",
-                                 inline=False)
-            embed_help.add_field(name="!spe edit <link> ",
-                                 value="Ändert den SPE link",
-                                 inline=False)
-            embed_help.add_field(name="!link> ", value="link",
-                                 inline=False)
-            embed_help.add_field(name="reagiere mit :poop:", value="und es wird durch THAT'S CRINGE ersetzt",
-                                 inline=False)
-            embed_help.add_field(name="schreibe was in war-kacken-channel", value="und es wird kommentiert. Und btw hast du eine kleine Chance auf den Goldenen Shit",
-                                 inline=False)
-            embed_help.add_field(name="!e",value="ECONOMY",inline=False)
-            embed_help.add_field(name="coin heads <zahl>", value="Coinflip", inline=False)
-            embed_help.add_field(name="transfer <zahl> <user>", value="Geld Senden", inline=False)
-            embed_help.add_field(name="banktransfer <zahl>", value="Geld in deine Bank", inline=False)
-            embed_help.add_field(name="wallettransfer <zahl>", value="Geld in deinen Geldbeutel", inline=False)
-            embed_help.add_field(name="balance", value="Zeigt dein Geld an", inline=False)
-            embed_help.add_field(name="payday", value="Zahltag alle 6h", inline=False)
-
-            await message.channel.send(embed=embed_help)
 
         if message.content.startswith("!link"):
             link = ["http://donut.cf/", "https://www.youtube.com/watch?v=dQw4w9WgXcQ", "http://donut.cf/wichtig.jpg", "http://www.republiquedesmangues.fr/", "http://endless.horse/", "https://heeeeeeeey.com/", "https://longdogechallenge.com/", "http://eelslap.com/", "https://thatsthefinger.com/", "https://puginarug.com/", "http://gurke.gq/", "https://stockx.com/de-de/adidas-yeezy-foam-rnnr-ararat", "https://i.imgur.com/4ipQcI8.jpg", "https://www.youtube.com/watch?v=5DlROhT8NgU", "https://www.youtube.com/watch?v=EuQfn-1Q09w&t=7s", "https://external-preview.redd.it/b25gXxDPv5T8UhpZLacaB1llx8Eul8S039j0LJzIswo.png?width=640&crop=smart&auto=webp&s=6e16f7e3e02612adfff312386f8bcb91d05a35d0","https://external-preview.redd.it/IyAa4qx3t-r5nmGbHQdTCUvNRRMwpZY2OZ6dXGXF0uo.png?auto=webp&s=0886e11a4333191958330c96f99bf04c2869faf2", "https://preview.redd.it/jx3yh2em89c61.jpg?width=640&crop=smart&auto=webp&s=422fd54a49c7eda8b6bdb03ef28c044f8d479cb9"] #hier gerne noch andere Links hinzufügen
@@ -93,6 +84,19 @@ class MyClient(discord.Client):
             print(message.channel.id)
         if message.content.startswith("!test"):
             1
+        if message.content.startswith("!klopf"):
+            mes = message.content.split(" ")
+            try:
+                zusatz2 = mes[1]
+            except IndexError:
+                zusatz2 = " "
+            try:
+                zusatz = mes[2]
+            except IndexError:
+                zusatz = " "
+            mess = [mes[0].lower(), zusatz2.lower(), zusatz.lower()]
+            if(zusatz2 != " "):
+                await klopf(zusatz2)
 
 #====================================================================================================================================================================================================
 
