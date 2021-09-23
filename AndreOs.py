@@ -65,7 +65,7 @@ class MyClient(discord.Client):
 
             antwort = openai.Completion.create(engine="curie", prompt=anfrage, stop=stop, temperature=0.3)
             choice = antwort["choices"][0]["text"]
-            
+
             await message.channel.send(choice)
 
         # reagiert nicht auf eigene Botnachrichten
@@ -118,6 +118,9 @@ class MyClient(discord.Client):
             mess = [mes[0].lower(), zusatz2.lower(), zusatz.lower()]
             if (zusatz2 != " "):
                 await frage(zusatz2)
+
+        if message.content.startswith("!Tamer"):
+            await message.channel.send("Gamer ")
 #====================================================================================================================================================================================================
 
 
