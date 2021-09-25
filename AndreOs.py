@@ -67,6 +67,16 @@ class MyClient(discord.Client):
             choice = antwort["choices"][0]["text"]
 
             await message.channel.send(choice)
+        # Andi-Arbeit1 Anfang
+        async def frageGenau(inhalt):
+            anfrage = "Q: " + inhalt + """
+            A:"""
+
+            antwort = openai.Completion.create(engine="curie", prompt=anfrage, stop=stop, temperature=0.0)
+            choice = antwort["choices"][0]["text"]
+
+            await message.channel.send(choice)
+        # Andi-Arbeit1 Ende
 
         # reagiert nicht auf eigene Botnachrichten
         if message.author == client.user:
@@ -118,7 +128,21 @@ class MyClient(discord.Client):
             mess = [mes[0].lower(), zusatz2.lower(), zusatz.lower()]
             if (zusatz2 != " "):
                 await frage(zusatz2)
-
+        #Andi-Arbeit2 Anfang
+        if message.content.startswith("!frageGenau"):
+            mes = message.content.split(" ", 1)
+            try:
+                zusatz2 = mes[1]
+            except IndexError:
+                zusatz2 = " "
+            try:
+                zusatz = mes[2]
+            except IndexError:
+                zusatz = " "
+            mess = [mes[0].lower(), zusatz2.lower(), zusatz.lower()]
+            if (zusatz2 != " "):
+                await frageGenau(zusatz2)
+        #Andi-Arbeit2 Ende
         if message.content.startswith("!Tamer"):
             await message.channel.send("Gamer ")
 #====================================================================================================================================================================================================
