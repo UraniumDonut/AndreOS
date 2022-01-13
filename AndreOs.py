@@ -2,6 +2,8 @@ import discord
 import random
 import json
 import os
+import requests
+import pprint
 from datetime import date, datetime, timedelta
 import time
 import asyncio
@@ -13,7 +15,7 @@ import openai
 path = os.getcwd()
 print(path)
 os.chdir(path)
-
+apikey = "CMO8IJ4OTQFK"
 
 
 with open("keys.json", "r") as f:
@@ -58,6 +60,21 @@ class MyClient(discord.Client):
             choice = antwort["choices"][0]["text"]
 
             await message.channel.send("-"+choice)
+
+        async def hitler():
+            await message.delete()
+            await message.channel.send("http://www.trunkworthy.com/wp-content/uploads/2016/03/a8ee99d84cd77f40824013f15c3b5c15e9f2b2c98d34eb73ff4c7e52f51d7e8b_1.gif")
+        async def hehehehaw():
+            await message.channel.send("https://tenor.com/view/clash-royale-emotes-laugh-smile-king-gif-14309345")
+        async def grr():
+            await message.channel.send("https://tenor.com/view/clash-royale-clashroyale-angry-gif-5302587")
+        async def gifsuch(inhalt):
+            #r = requests.get("https://api.tenor.com/v1/anonid?key=%s" % apikey)
+            #await message.channel.send(json.loads(r.content)["anon_id"])
+            r = requests.get("https://api.tenor.com/v1/search?q=%s&key=%s&limit=%s&anon_id=%s" %
+                (inhalt, apikey, 1, "248c90be1f634b3c810c6d060767f0a7"))
+            top_8gifs = json.loads(r.content)
+            await message.channel.send(top_8gifs["results"][0]["media"][0]["tinygif"]["url"])
 
         async def frage(inhalt):
             anfrage = "Q: " + inhalt + """
@@ -129,6 +146,32 @@ class MyClient(discord.Client):
             if (zusatz2 != " "):
                 await frage(zusatz2)
         #Andi-Arbeit2 Anfang
+        if message.content.find("hitler"):
+            zusatz = " "
+        else:
+            await hitler()
+        if message.content.find("heheheha"):
+            zusatz = " "
+        else:
+            await hehehehaw()
+        if message.content.find("grr"):
+            zusatz = " "
+        else:
+            await grr()
+
+        if message.content.startswith("!gif"):
+            mes = message.content.split(" ", 1)
+            try:
+                zusatz2 = mes[1]
+            except IndexError:
+                zusatz2 = " "
+            try:
+                zusatz = mes[2]
+            except IndexError:
+                zusatz = " "
+            mess = [mes[0].lower(), zusatz2.lower(), zusatz.lower()]
+            if (zusatz2 != " "):
+                await gifsuch(zusatz2)
         if message.content.startswith("!frageGenau"):
             mes = message.content.split(" ", 1)
             try:
